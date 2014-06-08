@@ -31,46 +31,46 @@
  */
 
 #ifndef YUBIKEY_CLIENT_H
-# define YUBIKEY_CLIENT_H
+#define YUBIKEY_CLIENT_H
 
-# include <stdint.h>
-# include <string.h>
+#include <stdint.h>
+#include <string.h>
 
 typedef enum {
-  /* Official yubikey client API errors. */
-  YUBIKEY_CLIENT_OK = 0,
-  YUBIKEY_CLIENT_BAD_OTP,
-  YUBIKEY_CLIENT_REPLAYED_OTP,
-  YUBIKEY_CLIENT_BAD_SIGNATURE,
-  YUBIKEY_CLIENT_MISSING_PARAMETER,
-  YUBIKEY_CLIENT_NO_SUCH_CLIENT,
-  YUBIKEY_CLIENT_OPERATION_NOT_ALLOWED,
-  YUBIKEY_CLIENT_BACKEND_ERROR,
-  /* Other implementation specific errors. */
-  YUBIKEY_CLIENT_OUT_OF_MEMORY = 100,
-  YUBIKEY_CLIENT_PARSE_ERROR
+    /* Official yubikey client API errors. */
+    YUBIKEY_CLIENT_OK = 0,
+    YUBIKEY_CLIENT_BAD_OTP,
+    YUBIKEY_CLIENT_REPLAYED_OTP,
+    YUBIKEY_CLIENT_BAD_SIGNATURE,
+    YUBIKEY_CLIENT_MISSING_PARAMETER,
+    YUBIKEY_CLIENT_NO_SUCH_CLIENT,
+    YUBIKEY_CLIENT_OPERATION_NOT_ALLOWED,
+    YUBIKEY_CLIENT_BACKEND_ERROR,
+    /* Other implementation specific errors. */
+    YUBIKEY_CLIENT_OUT_OF_MEMORY = 100,
+    YUBIKEY_CLIENT_PARSE_ERROR
 } yubikey_client_rc;
 
 typedef struct yubikey_client_st *yubikey_client_t;
 
-yubikey_client_t yubikey_client_init (void);
-void yubikey_client_done (yubikey_client_t *client);
+yubikey_client_t yubikey_client_init(void);
+void yubikey_client_done(yubikey_client_t *client);
 
 void
-yubikey_client_set_info (yubikey_client_t client,
-			 unsigned int client_id,
-			 size_t keylen,
-			 const char *key);
+yubikey_client_set_info(yubikey_client_t client,
+                        unsigned int client_id,
+                        size_t keylen,
+                        const char *key);
 
-const char *yubikey_client_strerror (int ret);
+const char *yubikey_client_strerror(int ret);
 
-int yubikey_client_request (yubikey_client_t client, const char *yubikey);
+int yubikey_client_request(yubikey_client_t client, const char *yubikey);
 
 /* One call interface. */
 int
-yubikey_client_simple_request (const char *yubikey,
-			       unsigned int client_id,
-			       size_t keylen,
-			       const char *key);
+yubikey_client_simple_request(const char *yubikey,
+                              unsigned int client_id,
+                              size_t keylen,
+                              const char *key);
 
 #endif
