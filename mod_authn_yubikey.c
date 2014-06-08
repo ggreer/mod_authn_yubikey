@@ -412,7 +412,7 @@ static authn_status authn_check_otp(request_rec *r, const char *user,
 
 
         ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_DEBUG, 0, r,
-                      LOG_PREFIX "We could extrace these values from the token:");
+                      LOG_PREFIX "We could extract these values from the token:");
         ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_DEBUG, 0, r,
                       LOG_PREFIX "The looked up token for the user: %s",
                       user);
