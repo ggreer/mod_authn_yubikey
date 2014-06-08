@@ -29,6 +29,7 @@
 #include "ap_provider.h"
 #include "apr_strings.h"
 #include "apr_dbm.h"
+#include "apr_md5.h"
 #include "apr_time.h"
 #include "http_core.h"
 #include "http_request.h"
@@ -63,12 +64,12 @@
 module AP_MODULE_DECLARE_DATA authn_yubikey_module;
 
 /* Default values */
-#define DEFAULT_TIMEOUT 43200 /* 12h */
-#define DEFAULT_REQUIRE_SECURE (TRUE)
-#define DEFAULT_EXTERNAL_ERROR_PAGE (FALSE)
-#define DEFAULT_USER_DB "conf/ykUserDb"
-#define DEFAULT_TMP_DB "conf/ykTmpDb"
-#define UNSET -1
+#define YK_AUTH_DEFAULT_TIMEOUT 43200 /* 12h */
+#define YK_AUTH_DEFAULT_REQUIRE_SECURE (TRUE)
+#define YK_AUTH_DEFAULT_EXTERNAL_ERROR_PAGE (FALSE)
+#define YK_AUTH_DEFAULT_USER_DB "conf/ykUserDb"
+#define YK_AUTH_DEFAULT_TMP_DB "conf/ykTmpDb"
+#define YK_AUTH_UNSET -1
 
 typedef struct
 {
@@ -244,7 +245,7 @@ static int isUserValid(const char *user,
      */
     passwordLength = (apr_size_t) strlen(password) - YUBIKEY_TOKEN_LENGTH;
     ap_log_rerror(APLOG_MARK, APLOG_ERR|APLOG_DEBUG, 0, r,
-		  LOG_PREFIX "The length of the entered password is: %d", passwordLength);
+		  LOG_PREFIX "The length of the entered password is: %zu", passwordLength);
 
     /* We have to distinct between a 44 character string which is the
      * toke output only and a longer string, which would contain a
@@ -639,9 +640,9 @@ static void *create_yubiauth_dir_cfg(apr_pool_t *pool, char *x)
     yubiauth_dir_cfg *dir = apr_pcalloc(pool, sizeof (yubiauth_dir_cfg));
     /* Set defaults configuration here
      */
-    dir->timeoutSeconds = UNSET;
-    dir->requireSecure = UNSET;
-    dir->externalErrorPage = UNSET;
+    dir->timeoutSeconds = YK_AUTH_UNSET;
+    dir->requireSecure = YK_AUTH_UNSET;
+    dir->externalErrorPage = YK_AUTH_UNSET;
 
     dir->tmpAuthDbFilename = NULL;
     dir->userAuthDbFilename = NULL;
@@ -656,29 +657,29 @@ static void *merge_yubiauth_dir_cfg(apr_pool_t *pool, void *BASE, void *ADD)
   yubiauth_dir_cfg *dir = apr_pcalloc(pool, sizeof (yubiauth_dir_cfg));
 
   /* merge */
-  dir->timeoutSeconds = (add->timeoutSeconds == UNSET) ? base->timeoutSeconds : add->timeoutSeconds; 
-  dir->requireSecure = (add->requireSecure == UNSET) ? base->requireSecure : add->requireSecure;
-  dir->externalErrorPage = (add->externalErrorPage == UNSET) ? base->externalErrorPage : add->externalErrorPage;
+  dir->timeoutSeconds = (add->timeoutSeconds == YK_AUTH_UNSET) ? base->timeoutSeconds : add->timeoutSeconds;
+  dir->requireSecure = (add->requireSecure == YK_AUTH_UNSET) ? base->requireSecure : add->requireSecure;
+  dir->externalErrorPage = (add->externalErrorPage == YK_AUTH_UNSET) ? base->externalErrorPage : add->externalErrorPage;
   
   dir->userAuthDbFilename = (add->userAuthDbFilename == NULL) ? base->userAuthDbFilename : add->userAuthDbFilename;
   dir->tmpAuthDbFilename = (add->tmpAuthDbFilename == NULL) ? base->tmpAuthDbFilename : add->tmpAuthDbFilename;
 
   /* Set defaults configuration here
    */
-  if (dir->timeoutSeconds == UNSET) {
-    dir->timeoutSeconds = DEFAULT_TIMEOUT;
+  if (dir->timeoutSeconds == YK_AUTH_UNSET) {
+    dir->timeoutSeconds = YK_AUTH_DEFAULT_TIMEOUT;
   }
-  if (dir->requireSecure == UNSET) {
-    dir->requireSecure = DEFAULT_REQUIRE_SECURE;
+  if (dir->requireSecure == YK_AUTH_UNSET) {
+    dir->requireSecure = YK_AUTH_DEFAULT_REQUIRE_SECURE;
   }
-  if (dir->externalErrorPage == UNSET) {
-    dir->externalErrorPage = DEFAULT_EXTERNAL_ERROR_PAGE;
+  if (dir->externalErrorPage == YK_AUTH_UNSET) {
+    dir->externalErrorPage = YK_AUTH_DEFAULT_EXTERNAL_ERROR_PAGE;
   }
   if (dir->userAuthDbFilename == NULL) {
-    dir->userAuthDbFilename = ap_server_root_relative(pool, DEFAULT_USER_DB);
+    dir->userAuthDbFilename = ap_server_root_relative(pool, YK_AUTH_DEFAULT_USER_DB);
   }
   if (dir->tmpAuthDbFilename == NULL) {
-    dir->tmpAuthDbFilename = ap_server_root_relative(pool, DEFAULT_TMP_DB);
+    dir->tmpAuthDbFilename = ap_server_root_relative(pool, YK_AUTH_DEFAULT_TMP_DB);
   }
   return dir;
 }
